@@ -1,7 +1,7 @@
 use std::{fs, collections::HashMap};
 use itertools::Itertools;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 struct Card  {
     id: u32,
     instances: u32,
@@ -77,7 +77,6 @@ fn main() {
                 }
             }
         }
-        println!("{:?}", cards.get(card_id).unwrap())
     }
 
     let mut total_value: u32 = 0;
