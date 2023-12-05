@@ -6,8 +6,8 @@ struct Card  {
     id: u32,
     instances: u32,
     wins: u32,
-    winning_numbers: Vec<String>,
-    gotten_numbers: Vec<String>
+    // winning_numbers: Vec<String>,
+    // gotten_numbers: Vec<String>
 }
 
 impl Card {
@@ -20,7 +20,7 @@ impl Card {
             }
         }
 
-        Self { id, instances: 1, wins, winning_numbers, gotten_numbers }
+        Self { id, instances: 1, wins }
     }
 
     pub fn add_instance(&mut self) {
