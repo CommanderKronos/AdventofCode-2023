@@ -70,7 +70,7 @@ fn main() {
             let mut index = cards[card_id].id;
             for _ in 0..cards[card_id].wins {
                 index += 1;
-                if index >= *card_limit {
+                if index > *card_limit {
                     break;
                 } else {
                     cards.get_mut(&index).unwrap().add_instance();
