@@ -1,6 +1,9 @@
 use std::fs;
+use std::time::{Duration, Instant};
 
 fn main() {
+    let start = Instant::now();
+
     // Read the file
     let file_name = String::from("input.txt");
     let file_content: String = match fs::read_to_string(file_name) {
@@ -14,8 +17,22 @@ fn main() {
     // Get the seed numbers
     let binding = input.clone();
     let seeds: Vec<u64> = binding[0].split_once(" ").unwrap().1.split(" ").map(|s| s.parse().expect("parse error")).collect();
-    
-    let mut seed_trans: Vec<u64> = seeds;
+    let seeds: Vec<&[u64]> = seeds.chunks(2).collect();
+
+    let mut seed_ranges: Vec<Vec<u64>> = Vec::new();
+    for seed_range in seeds {
+        seed_ranges.push(seed_range.to_vec())
+    }
+
+    println!("Passed: INIT");
+
+    let mut all_seeds: Vec<Vec<u64>> = Vec::new();
+    for bounds in &seed_ranges {
+        all_seeds.push((bounds[0]..bounds[0]+bounds[1]).collect());       
+    }
+    all_seeds.sort();
+
+    println!("Passed: SEED_VEC_CREATE");
 
     let mut binding = input.clone();
     for block in &mut binding[1..input.len()] {
@@ -33,31 +50,55 @@ fn main() {
                 range_vec.push(range_bounds);
             }
         }
+
+        println!("Passed: BLOCK_PARSE");
+
+        println!("You're not going crazy");
+        println!("You're not going crazy");
+        println!("You're not going crazy");
+        println!("You're not going crazy");
+
+        let mut new_all_seeds: Vec<Vec<u64>> = Vec::new();
+        println!("Trust me");
+        println!("Trust me");
+        println!("");
         
-        let mut location_values: Vec<u64> = Vec::new();
+        for seed_vec in all_seeds {
+            print!("=vec");
+            let mut new_seed_vec: Vec<u64> = Vec::new();
+            for seed in seed_vec {
+                let mut special_trans: bool = false;
+                let mut needed_vec: Vec<u64> = Vec::new();
+                for range in &range_vec {
+                    let src_start: u64 = range[1];
+                    let length: u64 = range[2];
 
-        for seed in &seed_trans {
-            let mut special_trans: bool = false;
-            let mut needed_vec: &Vec<u64> = &Vec::new();
-            for range in &range_vec {
-                let src_start: u64 = range[1];
-                let lenght: u64 = range[2];
+                    if (src_start..src_start+length).contains(&seed) {
+                        special_trans = true;
+                        needed_vec = range.to_vec();
+                    }
+                }
 
-                if (src_start..src_start+lenght).contains(seed) {
-                    special_trans = true;
-                    needed_vec = range;
+                if special_trans && !(needed_vec.is_empty()) {
+                    let new_number = needed_vec[0] + (seed - needed_vec[1]);
+                    new_seed_vec.push(new_number);
+                } else {
+                    new_seed_vec.push(seed);
                 }
             }
-            if special_trans == true && !(needed_vec.is_empty()) {
-                let new_number = needed_vec[0] + (seed - needed_vec[1]);
-                location_values.push(new_number)
-            } else {
-                location_values.push(*seed)
-            }
+            new_all_seeds.push(new_seed_vec);
         }
+        println!("");
 
-        seed_trans = location_values;
-        println!("Lowest translated value: {:?}", seed_trans.iter().min());
-        }
+        all_seeds = new_all_seeds;
+    }
+
+    let mut minimums: Vec<u64> = Vec::new();
+    for seed_vec in all_seeds {
+        minimums.push(*seed_vec.iter().min().unwrap())
+    }
+
+    let duration = start.elapsed();
+    println!("The minimum Location value is: {:?}, This was calculated in: {:?}", minimums.iter().min().unwrap(), duration)
 
 }
