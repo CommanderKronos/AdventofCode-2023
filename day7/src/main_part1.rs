@@ -41,20 +41,6 @@ fn check_type(cards: Vec<char>) -> HandType {
     println!("=========================");
     println!("{:?}", occurences);
 
-    // If occurences contains the key 'J', store it's value in the highest value after removing the entry
-    if occurences.contains_key(&'J') {
-        // Make sure the hand of cards isn't ONLY jokers (cheecky fuckers)
-        if occurences.get(&'J').unwrap().to_owned() != 5 {
-            let joker_value = occurences.remove(&'J').unwrap();
-            let occurences_clone = occurences.clone();
-            let max_value_key = occurences_clone
-                                .iter()
-                                .max_by(|a, b| a.1.cmp(&b.1))
-                                .map(|(k, _v)| k).unwrap();
-            *occurences.get_mut(max_value_key).unwrap() += joker_value;
-        }
-    }
-
     let mut values: Vec<usize> = occurences.clone()
         .into_iter()
         .map(|(_, value)| value)
@@ -87,11 +73,11 @@ fn check_card_value(cards: Vec<char>) -> Vec<u32> {
     for card in cards {
         value_vec.push(
             match card {
-                'A' => 13,
-                'K' => 12,
-                'Q' => 11,
+                'A' => 14,
+                'K' => 13,
+                'Q' => 12,
+                'J' => 11,
                 'T' => 10,
-                'J' => 1,
                 _ => card.to_digit(10).unwrap()
             }
         )
