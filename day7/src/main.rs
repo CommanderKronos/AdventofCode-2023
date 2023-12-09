@@ -133,7 +133,6 @@ impl HandType {
 
 #[derive(Debug)]
 struct Hand {
-    cards: Vec<char>,
     card_occurence_count: Vec<u32>,
     hand_type: HandType,
     bid: u32
@@ -145,6 +144,6 @@ impl Hand {
         let hand_type = check_type(card_vec.clone());
         let card_occurence_count = check_card_value(card_vec.clone());
 
-        Self { cards: card_vec, card_occurence_count, hand_type, bid: bid_str.parse().unwrap() }
+        Self { card_occurence_count, hand_type, bid: bid_str.parse().unwrap() }
     }
 }
