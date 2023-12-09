@@ -9,14 +9,15 @@ fn main() {
         Err(error) => panic!("Error opening the file. Error: {:?}", error),
     };
 
+    // Create a Hand object from all the lines and fill the all_hands vector with them
     let mut all_hands: Vec<Hand> = Vec::new();
     for line in file_content.lines() {
         let (card_str, bid_str) = line.split_once(" ").unwrap();
         all_hands.push(Hand::new(card_str, bid_str))
     }
 
-    // Sort by card values first
-    all_hands.sort_by(|hand1, hand2| hand1.card_values.cmp(&hand2.card_values));
+    // Sort by (individual) card occurence_count first
+    all_hands.sort_by(|hand1, hand2| hand1.card_occurence_count.cmp(&hand2.card_occurence_count));
 
     // Sort by hand_type value
     all_hands.sort_by(|hand1, hand2| hand1.hand_type.value().cmp(&hand2.hand_type.value()));
@@ -34,6 +35,7 @@ fn main() {
 
 fn check_type(cards: Vec<char>) -> HandType {
     
+    // Count occurences of each card label
     let mut occurences: HashMap<char, usize> = HashMap::new();
     for card in cards {
         *occurences.entry(card).or_default() += 1;
@@ -55,13 +57,15 @@ fn check_type(cards: Vec<char>) -> HandType {
         }
     }
 
-    let mut values: Vec<usize> = occurences.clone()
+    // Get the values for same-card occurences into a vector, sorted so there are only a
+    // small amount of possible versions of the vector
+    let mut occurence_count: Vec<usize> = occurences.clone()
         .into_iter()
         .map(|(_, value)| value)
         .collect();
-    values.sort();
+    occurence_count.sort();
 
-    // Values meaning:
+    // occurence_count meaning:
     // [5] == five of a kind
     // [1, 4] == four of a kind
     // [1, 1, 3] == three of a kind
@@ -69,7 +73,7 @@ fn check_type(cards: Vec<char>) -> HandType {
     // [1, 2, 2] == two pair
     // [1, 1, 1, 2] == one pair
     // [1, 1, 1, 1] == high card
-    match values[..] {
+    match occurence_count[..] {
         [5] => HandType::Kind5,
         [1, 4] => HandType::Kind4,
         [1, 1, 3] => HandType::Kind3,
@@ -83,6 +87,7 @@ fn check_type(cards: Vec<char>) -> HandType {
 }
 
 fn check_card_value(cards: Vec<char>) -> Vec<u32> {
+    // Convert a vector of card labels to a vector of the related card label value
     let mut value_vec: Vec<u32> = Vec::new();
     for card in cards {
         value_vec.push(
@@ -112,6 +117,7 @@ enum HandType {
 }
 
 impl HandType {
+    // call this function to assign a numerical value to the different types of hands
     const fn value(&self) -> u32 {
         match *self {
             HandType::Kind5 => 7,
@@ -128,7 +134,7 @@ impl HandType {
 #[derive(Debug)]
 struct Hand {
     cards: Vec<char>,
-    card_values: Vec<u32>,
+    card_occurence_count: Vec<u32>,
     hand_type: HandType,
     bid: u32
 }
@@ -137,8 +143,8 @@ impl Hand {
     pub fn new(card_str: &str, bid_str: &str) -> Self {
         let card_vec: Vec<char> = card_str.chars().collect();
         let hand_type = check_type(card_vec.clone());
-        let card_values = check_card_value(card_vec.clone());
+        let card_occurence_count = check_card_value(card_vec.clone());
 
-        Self { cards: card_vec, card_values, hand_type, bid: bid_str.parse().unwrap() }
+        Self { cards: card_vec, card_occurence_count, hand_type, bid: bid_str.parse().unwrap() }
     }
 }
